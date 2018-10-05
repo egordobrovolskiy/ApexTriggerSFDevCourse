@@ -23,13 +23,10 @@ public class UpdateAmountOfEmployeesModelHandler {
         List<Territory__c> listIdTerritory = new List<Territory__c>();
 
         for (Territory__c terrNew : listTerrNew) {
-           // if (mapTerrOld.get(terrNew.Id).TerritoryModel__c != null) {
-          //      if (mapTerrOld.get(terrNew.Id).TerritoryModel__c != terrNew.TerritoryModel__c ||
-         //               mapTerrOld.get(terrNew.Id).TerritoryModel__c != terrNew.TerritoryModel__c) {
-                    listIdTerritory.add(terrNew);
-
-         //       }
-         //   }
+            if (mapTerrOld.get(terrNew.Id).numberOfEmployees__c != terrNew.numberOfEmployees__c ||
+                    mapTerrOld.get(terrNew.Id).TerritoryModel__c != terrNew.TerritoryModel__c  ) {
+                listIdTerritory.add(terrNew);
+            }
         }
         UpdateEmployeesOnModelService.updateEmpl(listIdTerritory);
 
