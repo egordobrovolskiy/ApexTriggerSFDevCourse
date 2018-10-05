@@ -1,6 +1,6 @@
 public class UpdateEmployeesOnModelService {
 
-    public static void execute(List<Territory__c> listObj) {
+    public static void updateEmpl(List<Territory__c> listObj) {
 
         Set<Id> setIdTerritoryModel = new Set<Id>();
         for (Territory__c obj : listObj) {
