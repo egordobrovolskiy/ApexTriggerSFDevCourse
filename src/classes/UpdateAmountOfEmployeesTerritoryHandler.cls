@@ -2,19 +2,22 @@ public class UpdateAmountOfEmployeesTerritoryHandler {
     
     public static void onInsert (List<Account> listObj) {
 
-        UpdateEmployeesOnTerrytoriService.updateEmpl(listObj);
+        Set<Id> result = getIdsTerritory(listObj);
+        UpdateEmployeesOnTerrytoriService.updateEmpl(result);
 
     }
     
     public static void onDelete (List<Account> listObjOld) {
 
-        UpdateEmployeesOnTerrytoriService.updateEmpl(listObjOld);
+        Set<Id> result = getIdsTerritory(listObjOld);
+        UpdateEmployeesOnTerrytoriService.updateEmpl(result);
 
     }
 
     public static void onUndelete(List<Account> listObj) {
 
-        UpdateEmployeesOnTerrytoriService.updateEmpl(listObj);
+        Set<Id> result = getIdsTerritory(listObj);
+        UpdateEmployeesOnTerrytoriService.updateEmpl(result);
 
     }
 
@@ -28,8 +31,17 @@ public class UpdateAmountOfEmployeesTerritoryHandler {
                 listAccounts.add(accNew);
             }
         }
-        UpdateEmployeesOnTerrytoriService.updateEmpl(listAccounts);
+        Set<Id> result = getIdsTerritory(listAccounts);
+        UpdateEmployeesOnTerrytoriService.updateEmpl(result);
 
+    }
+
+    private static Set<Id> getIdsTerritory(List<Account> listObj) {
+        Set<Id> result = new Set<Id>();
+        for (Account obj : listObj) {
+            result.add(obj.Territory__c);
+        }
+        return result;
     }
     
 }

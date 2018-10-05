@@ -1,30 +1,34 @@
 public class UpdateEmployeesOnTerrytoriService {
 
-    public static void updateEmpl(List<Account> listObj) {
+    public static void updateEmpl(Set<Id> setIdTerritory) {
 
-        Set<Id> setIdTerritory = new Set<Id>();
+        Map<Id, Territory__c> mapTerritory = new Map<Id, Territory__c>([
+                SELECT Id, numberOfEmployees__c
+                FROM Territory__c
+                WHERE Id In :setIdTerritory
+        ]);
 
-        for (Account obj : listObj) {
-            setIdTerritory.add(obj.Territory__c);
+        AggregateResult[] aggregateResults = [
+                SELECT Territory__c, SUM(numberOfEmployees__c)
+                FROM Account
+                WHERE Territory__c IN :setIdTerritory
+                GROUP BY Territory__c
+        ];
+
+        changeTerritory(mapTerritory, aggregateResults);
+
+
+        update mapTerritory.values();
+
+    }
+
+
+
+    private static void changeTerritory(Map<Id, Territory__c> mapTerritory, List<AggregateResult> aggregateResults) {
+        for (AggregateResult ar : aggregateResults) {
+            Id terrId =(Id) ar.get('Territory__c');
+            Territory__c terr = mapTerritory.get(terrId);
+            terr.numberOfEmployees__c = Integer.valueOf(ar.get('expr0'));
         }
-
-        List<Territory__c> listTerritory = [SELECT Id, numberOfEmployees__c,
-        (SELECT Id, numberOfEmployees__c FROM Accounts__r)
-        FROM Territory__c
-        WHERE Id In : setIdTerritory];
-        AggregateResult[] aggregateResults = [SELECT Territory__c, SUM(numberOfEmployees__c)
-        FROM Account
-        WHERE Territory__c  IN : setIdTerritory
-        GROUP BY Territory__c];
-
-        for (AggregateResult ar: aggregateResults) {
-            for (Territory__c terr: listTerritory) {
-                if (ar.get('Territory__c') == terr.Id) {
-                    terr.numberOfEmployees__c = Integer.valueOf(ar.get('expr0'));
-                }
-            }
-        }
-        update listTerritory;
-
     }
 }
