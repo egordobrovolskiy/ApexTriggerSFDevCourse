@@ -15,7 +15,7 @@ public class UpdateEmployeesOnTerrytoriService {
                 GROUP BY Territory__c
         ];
 
-        changeTerritory(mapTerritory, aggregateResults);
+        updateTerritory(mapTerritory, aggregateResults);
 
 
         update mapTerritory.values();
@@ -24,7 +24,7 @@ public class UpdateEmployeesOnTerrytoriService {
 
 
 
-    private static void changeTerritory(Map<Id, Territory__c> mapTerritory, List<AggregateResult> aggregateResults) {
+    private static void updateTerritory(Map<Id, Territory__c> mapTerritory, List<AggregateResult> aggregateResults) {
         for (AggregateResult ar : aggregateResults) {
             Id terrId =(Id) ar.get('Territory__c');
             Territory__c terr = mapTerritory.get(terrId);

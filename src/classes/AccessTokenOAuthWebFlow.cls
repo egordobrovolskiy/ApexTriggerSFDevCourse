@@ -6,10 +6,10 @@ public with sharing class AccessTokenOAuthWebFlow {
 
     private static AccessTokenOAuthWebFlow instance;
 
-    private String authToken = 'aPrxYkXCmZcIH2y1_jK0v_KgPYgsCd5zMC4sRQO7Q7feqxWpNOJBY5c99pAVMbUHzQAXDOn_Ew%3D%3D';
+    private String authToken = 'aPrxYkXCmZcIH2y1_jK0v_KgPZ_RYw7xuEcXt8jxZCMnNUDjrvos.edrX3JezlEbO.AOSrNVhQ==';
     private String client_id = '3MVG9fTLmJ60pJ5I19dJ4NlkP67SDTMsZdbhit0RUKEgIH7NYeFdJCv9yVEs1NU_evf6hKibOQA==';
     private String client_secret = '9006521462906902298';
-    private String redirect_uri = 'https://localhost';
+    private String redirect_uri = 'https://web-flow-oauth-developer-edition.eu16.force.com/webflow';
 
     private String accessToken;
     private String refreshToken;
@@ -32,6 +32,7 @@ public with sharing class AccessTokenOAuthWebFlow {
     }
 
     private void getToken() {
+
         Http http = new Http();
         HttpRequest request = new HttpRequest();
         request.setEndpoint('https://login.salesforce.com/services/oauth2/token');
@@ -47,6 +48,7 @@ public with sharing class AccessTokenOAuthWebFlow {
         parseJson(response);
 
     }
+
     public void refreshToken() {
         Http http = new Http();
         HttpRequest request = new HttpRequest();
@@ -58,9 +60,8 @@ public with sharing class AccessTokenOAuthWebFlow {
                 + '&refresh_token=' + refreshToken);
         HttpResponse response = http.send(request);
         parseJson(response);
-
-
     }
+
     private void parseJson(HttpResponse response) {
         JSONParser parser = JSON.createParser(response.getBody());
         while (parser.nextToken() != null) {

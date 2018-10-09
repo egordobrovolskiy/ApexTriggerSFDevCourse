@@ -22,19 +22,21 @@ public class UpdateAmountOfEmployeesTerritoryHandler {
     }
 
     public static void onUpdate(Map<Id, Account> mapAccOld, List<Account> listAccNew) {
-
-        List<Account> listAccounts = new List<Account>();
+        Set<Id> setIdsTerr = new Set<Id>();
 
         for (Account accNew : listAccNew) {
             if (accNew.Territory__c != null) {
                 if (mapAccOld.get(accNew.Id).numberOfEmployees__c != accNew.numberOfEmployees__c ||
                         mapAccOld.get(accNew.Id).Territory__c != accNew.Territory__c) {
-                    listAccounts.add(accNew);
+                    setIdsTerr.add(accNew.Territory__c);
+                }
+            } else {
+                if (mapAccOld.get(accNew.Id).Territory__c != null) {
+                    setIdsTerr.add(mapAccOld.get(accNew.Id).Territory__c);
                 }
             }
         }
-        Set<Id> result = getIdsTerritory(listAccounts);
-        UpdateEmployeesOnTerrytoriService.updateEmpl(result);
+        UpdateEmployeesOnTerrytoriService.updateEmpl(setIdsTerr);
 
     }
 

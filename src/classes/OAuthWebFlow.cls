@@ -9,7 +9,8 @@ public with sharing class OAuthWebFlow {
 
 
     public static String createAccount(String nameAccount) {
-        String accessToken = AccessTokenOAuthWebFlow.getInstance().getAccessToken();
+        String accessToken = AccessTokenWebFlow.getInstance().getAccessToken();
+
 
         Http http = new Http();
         HttpRequest request = new HttpRequest();
@@ -29,6 +30,7 @@ public with sharing class OAuthWebFlow {
             return response.getBody();
         } else {
             if (numberOfAttempts < 2) {
+                AccessTokenWebFlow.getInstance().refreshToken();
                 numberOfAttempts++;
                 return createAccount(nameAccount);
             } else {
@@ -38,7 +40,7 @@ public with sharing class OAuthWebFlow {
     }
 
     public static Map<String, Object> getAnyAccount() {
-        String accessToken = AccessTokenOAuthWebFlow.getInstance().getAccessToken();
+        String accessToken = AccessTokenWebFlow.getInstance().getAccessToken();
 
         Http http = new Http();
         HttpRequest request = new HttpRequest();
@@ -47,6 +49,7 @@ public with sharing class OAuthWebFlow {
         request.setEndpoint(END_POINT);
         request.setMethod('GET');
         HttpResponse response = http.send(request);
+        System.debug(response.getBody());
         if (response.getStatusCode() == 200) {
             Map<String, Object> results = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
             for (String acc : results.keySet()) {
@@ -55,6 +58,7 @@ public with sharing class OAuthWebFlow {
             return results;
         } else {
             if (numberOfAttempts < 2) {
+                AccessTokenWebFlow.getInstance().refreshToken();
                 numberOfAttempts++;
                 return getAnyAccount();
             } else {

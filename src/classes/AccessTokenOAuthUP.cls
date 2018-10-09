@@ -4,23 +4,24 @@
 
 public with sharing class AccessTokenOAuthUP {
 
-    private static AccessTokenOAuthUP instance;
 
-    private String endpoint = 'https://login.salesforce.com/services/oauth2/token';
-    private String username = 'egordobrovolskiy@cunning-bear-99wudk.com';
-    private String password = 'qwer1234';
-    private String clientId = '3MVG9fTLmJ60pJ5I19dJ4NlkP682B_2R2_22C.cTaJS59djW42pG3icH2KB1bGakreFHZ.P2dpq_mH3NDrTce';
-    private String clientSecret = '8841339545979335288';
+    private String endpoint = '';
+    private String username = '';
+    private String password = '';
+    private String clientId = '';
+    private String clientSecret = '';
+    private String grantType = '';
 
     private String accessToken;
 
-    private AccessTokenOAuthUP() {}
+    private AccessTokenOAuthUP(Builder builder) {
+        this.endpoint = builder.endpoint;
+        this.username = builder.username;
+        this.password = builder.password;
+        this.clientId = builder.clientId;
+        this.clientSecret = builder.clientSecret;
+        this.grantType = builder.grantType;
 
-    public static AccessTokenOAuthUP getInstance() {
-        if (instance == null) {
-            instance = new AccessTokenOAuthUP();
-        }
-        return instance;
     }
 
     public String getAccessToken() {
@@ -34,7 +35,7 @@ public with sharing class AccessTokenOAuthUP {
         Httprequest req = new HttpRequest();
         req.setMethod('POST');
         req.setHeader('Content-Type', 'application/x-www-form-urlencoded');
-        req.setBody('grant_type=password' +
+        req.setBody('grant_type=' + grantType +
                 '&client_id=' + clientId +
                 '&client_secret=' + clientSecret +
                 '&username=' + username +
@@ -60,4 +61,41 @@ public with sharing class AccessTokenOAuthUP {
             }
         }
     }
+   public class Builder {
+       private String endpoint = '';
+       private String username = '';
+       private String password = '';
+       private String clientId = '';
+       private String clientSecret = '';
+       private String grantType = 'password';
+       public Builder() {}
+       public Builder endPoint(String endpoint) {
+           this.endpoint = endpoint;
+           return this;
+       }
+       public Builder username(String username) {
+           this.username = username;
+           return this;
+       }
+       public Builder password(String password) {
+           this.password = password;
+           return this;
+       }
+       public Builder clientId(String clientId) {
+           this.clientId = clientId;
+           return this;
+       }
+       public Builder clientSecret(String clientSecret) {
+           this.clientSecret = clientSecret;
+           return this;
+       }
+       public Builder grantType(String grantType){
+           this.grantType = grantType;
+           return this;
+       }
+       public AccessTokenOAuthUP build(){
+           return new AccessTokenOAuthUP(this);
+       }
+
+   }
 }
