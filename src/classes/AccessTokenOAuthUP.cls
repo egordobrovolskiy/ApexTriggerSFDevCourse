@@ -4,98 +4,42 @@
 
 public with sharing class AccessTokenOAuthUP {
 
-
-    private String endpoint = '';
-    private String username = '';
-    private String password = '';
-    private String clientId = '';
-    private String clientSecret = '';
-    private String grantType = '';
-
-    private String accessToken;
-
-    private AccessTokenOAuthUP(Builder builder) {
-        this.endpoint = builder.endpoint;
-        this.username = builder.username;
-        this.password = builder.password;
-        this.clientId = builder.clientId;
-        this.clientSecret = builder.clientSecret;
-        this.grantType = builder.grantType;
-
+    private OAuth__mdt usernamePasswordCMT;
+    
+    public AccessTokenOAuthUP() {
+        this.usernamePasswordCMT = [
+                SELECT
+                        Client_Id__c,
+                        Client_Secret__c,
+                        Username__c,
+                        Password__c
+                FROM OAuth__mdt
+                WHERE MasterLabel = 'Username Password'
+        ][0];
     }
 
-    public String getAccessToken() {
-        if (String.isEmpty(accessToken)) {
-            getSessionId();
-        }
-        return accessToken;
-    }
 
-    private void getSessionId() {
-        Httprequest req = new HttpRequest();
-        req.setMethod('POST');
-        req.setHeader('Content-Type', 'application/x-www-form-urlencoded');
-        req.setBody('grant_type=' + grantType +
-                '&client_id=' + clientId +
-                '&client_secret=' + clientSecret +
-                '&username=' + username +
-                '&password=' + password
-        );
-        req.setEndpoint(endpoint);
+    public void getToken() {
         Http http = new Http();
-        HttpResponse res = http.send(req);
-        system.debug('body:' + res.getBody());
-        parseJson(res);
+        Httprequest request = new HttpRequest();
+        request.setEndpoint('https://login.salesforce.com/services/oauth2/token');
+        request.setMethod('POST');
+        request.setHeader('Content-Type', 'application/x-www-form-urlencoded');
+        request.setBody('grant_type=password'
+                + '&client_id=' + usernamePasswordCMT.Client_Id__c
+                + '&client_secret=' + usernamePasswordCMT.Client_Secret__c
+                + '&username=' + usernamePasswordCMT.Username__c
+                + '&password=' + usernamePasswordCMT.Password__c
+        );
+        HttpResponse response = http.send(request);
+        system.debug('body:' + response.getBody());
 
-    }
-    private void parseJson(HttpResponse res) {
-        JSONParser parser = JSON.createParser(res.getBody());
-        while (parser.nextToken() != null) {
-            if ((parser.getCurrentToken() == JSONToken.FIELD_NAME)) {
-                String fieldName = parser.getText();
-                parser.nextToken();
-                System.debug('fieldName = ' + fieldName);
-                if (fieldName == 'access_token') {
-                    accessToken = parser.getText();
-                }
-            }
-        }
-    }
-   public class Builder {
-       private String endpoint = '';
-       private String username = '';
-       private String password = '';
-       private String clientId = '';
-       private String clientSecret = '';
-       private String grantType = 'password';
-       public Builder() {}
-       public Builder endPoint(String endpoint) {
-           this.endpoint = endpoint;
-           return this;
-       }
-       public Builder username(String username) {
-           this.username = username;
-           return this;
-       }
-       public Builder password(String password) {
-           this.password = password;
-           return this;
-       }
-       public Builder clientId(String clientId) {
-           this.clientId = clientId;
-           return this;
-       }
-       public Builder clientSecret(String clientSecret) {
-           this.clientSecret = clientSecret;
-           return this;
-       }
-       public Builder grantType(String grantType){
-           this.grantType = grantType;
-           return this;
-       }
-       public AccessTokenOAuthUP build(){
-           return new AccessTokenOAuthUP(this);
-       }
+        Map<String, Object> parse = (Map<String, Object>) Json.deserializeUntyped(response.getBody());
+        String accessToken = (String) parse.get('access_token');
 
-   }
+        access_token__c accessTokenSettings = access_token__c.getOrgDefaults();
+        accessTokenSettings.Token__c = accessToken;
+        update accessTokenSettings;
+    }
+
 }
