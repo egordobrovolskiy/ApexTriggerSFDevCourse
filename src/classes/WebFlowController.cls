@@ -2,22 +2,19 @@
  * Created by Yehor Dobrovolskyi on 09.10.2018.
  */
 
-public class WebFlowController {
+public without sharing class WebFlowController {
 
-    public String getCode() {
-
+    private static Boolean isCode = false;
+    public void doCallout() {
         String code = ApexPages.currentPage().getParameters().get('code');
-
         if (!String.isEmpty(code)) {
-
-            AccessTokenWebFlow.getInstance().getToken(code);
-
-            return 'Code send : ' + code;
-        } else {
-            return 'Try again';
+           new AccessTokenWebFlow().getToken(code);
+            isCode = true;
         }
+    }
 
-
+    public String getIsCode() {
+        return String.valueOf(isCode);
     }
 
 }

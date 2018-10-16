@@ -9,8 +9,8 @@ public with sharing class RemotelyCreateAccount {
             .endPoint('https://login.salesforce.com/services/oauth2/token')
             .username('egordobrovolskiy@cunning-bear-99wudk.com')
             .password('qwer1234')
-            .clientId('3MVG9fTLmJ60pJ5I19dJ4NlkP682B_2R2_22C.cTaJS59djW42pG3icH2KB1bGakreFHZ.P2dpq_mH3NDrTce')
-            .clientSecret('8841339545979335288')
+            .clientId('3MVG9fTLmJ60pJ5I19dJ4NlkP67SDTMsZdbhit0RUKEgIH7NYeFdJCv9yVEs1NU_evf6hKibOQA==')
+            .clientSecret('9006521462906902298')
             .grantType('password')
             .build();
 

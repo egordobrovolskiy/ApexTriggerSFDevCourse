@@ -2,75 +2,52 @@
  * Created by Yehor Dobrovolskyi on 09.10.2018.
  */
 
-public with sharing class AccessTokenWebFlow {
-    private static AccessTokenWebFlow instance;
+public without sharing class AccessTokenWebFlow {
 
-    private  String accessToken;
-    private  String refreshToken;
+    private web_flou_token__c webFlowCMT;
 
-    private WebFlou__mdt webFlouCMT;
-
-   private AccessTokenWebFlow() {
-       this.webFlouCMT = [SELECT
-               Client_Secret__c,
-               Client_Id__c,
-               RedirectUri__c
-       FROM WebFlou__mdt
-       WHERE Label = 'WebFlouToken'];
-   }
-
-    public static AccessTokenWebFlow getInstance() {
-        if (instance == null) {
-            instance = new AccessTokenWebFlow();
-        }
-        return instance;
-    }
-
-    public String getAccessToken(){
-        return accessToken;
+    public AccessTokenWebFlow() {
+        this.webFlowCMT = web_flou_token__c.getOrgDefaults();
     }
 
     public void getToken(String authToken) {
-
         Http http = new Http();
         HttpRequest request = new HttpRequest();
         request.setEndpoint('https://login.salesforce.com/services/oauth2/token');
         request.setMethod('POST');
         request.setBody('grant_type=authorization_code'
                 + '&code=' + authToken
-                + '&client_id=' + webFlouCMT.Client_Id__c
-                + '&client_secret=' + webFlouCMT.Client_Secret__c
-                + '&redirect_uri=' + webFlouCMT.RedirectUri__c);
+                + '&client_id=' + webFlowCMT.Client_Id__c
+                + '&client_secret=' + webFlowCMT.Client_Secret__c
+                + '&redirect_uri=' + webFlowCMT.RedirectUri__c);
         System.debug(request.getBody());
         HttpResponse response = http.send(request);
         System.debug(response.getBody());
-        parseJson(response);
 
-        refreshToken();
+        Map<String, Object> parse = (Map<String, Object>) Json.deserializeUntyped(response.getBody());
+        String accessToken = (String) parse.get('access_token');
+        String refreshToken = (String) parse.get('refresh_token');
 
-        System.debug(OAuthWebFlow.createAccount('Create from Web Site Refresh3'));
+        refreshToken(refreshToken);
 
     }
 
-    public void refreshToken() {
+    private void refreshToken(String refreshToken) {
         Http http = new Http();
         HttpRequest request = new HttpRequest();
         request.setEndpoint('https://login.salesforce.com/services/oauth2/token');
         request.setMethod('POST');
         request.setBody('grant_type=refresh_token'
-                + '&client_id=' + webFlouCMT.Client_Id__c
-                + '&client_secret=' + webFlouCMT.Client_Secret__c
+                + '&client_id=' + webFlowCMT.Client_Id__c
+                + '&client_secret=' + webFlowCMT.Client_Secret__c
                 + '&refresh_token=' + refreshToken);
         HttpResponse response = http.send(request);
-        parseJson(response);
-        web_flou_token__c wft = web_flou_token__c.getOrgDefaults();
-        wft.access_token__c = accessToken;
-//        update wft;
+
+        Map<String, Object> parse = (Map<String, Object>) Json.deserializeUntyped(response.getBody());
+        String accessToken = (String) parse.get('access_token');
+
+        webFlowCMT.access_token__c = accessToken;
+        update webFlowCMT;
     }
 
-    private void parseJson(HttpResponse response) {
-        Map<String, Object> parse =(Map<String, Object>) Json.deserializeUntyped(response.getBody());
-        accessToken = (String) parse.get('access_token');
-        refreshToken = (String) parse.get('refresh_token');
-    }
 }

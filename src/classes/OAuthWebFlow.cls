@@ -3,14 +3,13 @@
  */
 
 public with sharing class OAuthWebFlow {
-    private static final String END_POINT = 'https://cunning-bear-99wudk-dev-ed.my.salesforce.com/services/apexrest/Account/' ;
+    private static final String END_POINT = web_flou_token__c.getOrgDefaults().end_point__c;
 
     private static Integer numberOfAttempts = 0;
 
 
     public static String createAccount(String nameAccount) {
-        String accessToken = AccessTokenWebFlow.getInstance().getAccessToken();
-
+        String accessToken = web_flou_token__c.getOrgDefaults().access_token__c;
 
         Http http = new Http();
         HttpRequest request = new HttpRequest();
@@ -29,18 +28,13 @@ public with sharing class OAuthWebFlow {
         if (response.getStatusCode() == 200) {
             return response.getBody();
         } else {
-            if (numberOfAttempts < 2) {
-                AccessTokenWebFlow.getInstance().refreshToken();
-                numberOfAttempts++;
-                return createAccount(nameAccount);
-            } else {
-                return null;
-            }
+            return null;
         }
     }
 
-    public static Map<String, Object> getAnyAccount() {
-        String accessToken = AccessTokenWebFlow.getInstance().getAccessToken();
+
+    public static HttpResponse getAnyAccount() {
+        String accessToken = web_flou_token__c.getOrgDefaults().access_token__c;
 
         Http http = new Http();
         HttpRequest request = new HttpRequest();
@@ -49,21 +43,14 @@ public with sharing class OAuthWebFlow {
         request.setEndpoint(END_POINT);
         request.setMethod('GET');
         HttpResponse response = http.send(request);
-        System.debug(response.getBody());
         if (response.getStatusCode() == 200) {
             Map<String, Object> results = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
             for (String acc : results.keySet()) {
                 System.debug(acc + ' = ' + results.get(acc));
             }
-            return results;
+            return response;
         } else {
-            if (numberOfAttempts < 2) {
-                AccessTokenWebFlow.getInstance().refreshToken();
-                numberOfAttempts++;
-                return getAnyAccount();
-            } else {
-                return null;
-            }
+            return null;
         }
     }
 }
