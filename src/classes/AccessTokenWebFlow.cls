@@ -4,10 +4,17 @@
 
 public without sharing class AccessTokenWebFlow {
 
-    private web_flou_token__c webFlowCMT;
+    private OAuth__mdt webFlowCMT;
 
     public AccessTokenWebFlow() {
-        this.webFlowCMT = web_flou_token__c.getOrgDefaults();
+        this.webFlowCMT = [
+                SELECT
+                Client_Id__c,
+                Client_Secret__c,
+                RedirectUri__c
+                FROM OAuth__mdt
+                WHERE MasterLabel = 'Web flow'
+        ][0];
     }
 
     public void getToken(String authToken) {
@@ -46,8 +53,9 @@ public without sharing class AccessTokenWebFlow {
         Map<String, Object> parse = (Map<String, Object>) Json.deserializeUntyped(response.getBody());
         String accessToken = (String) parse.get('access_token');
 
-        webFlowCMT.access_token__c = accessToken;
-        update webFlowCMT;
+        access_token__c accessTokenSettings = access_token__c.getOrgDefaults();
+        accessTokenSettings.Token__c = accessToken;
+        update accessTokenSettings;
     }
 
 }

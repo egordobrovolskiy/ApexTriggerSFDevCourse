@@ -1,15 +1,20 @@
 /**
- * Created by dobro on 07.10.2018.007.
+ * Created by Yehor Dobrovolskyi on 16.10.2018.
  */
 
-public with sharing class OAuthWebFlow {
-    private static final String END_POINT = web_flou_token__c.getOrgDefaults().end_point__c;
+public with sharing class RemoteAccountCRUD {
+
+    private static final String END_POINT = [
+            SELECT End_Point__c
+            FROM OAuth__mdt
+            WHERE MasterLabel = 'Web flow'
+    ][0].End_Point__c;
 
     private static Integer numberOfAttempts = 0;
 
 
     public static String createAccount(String nameAccount) {
-        String accessToken = web_flou_token__c.getOrgDefaults().access_token__c;
+        String accessToken = access_token__c.getOrgDefaults().Token__c;
 
         Http http = new Http();
         HttpRequest request = new HttpRequest();

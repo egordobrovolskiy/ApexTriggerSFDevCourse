@@ -1,0 +1,26 @@
+<!--
+ - Created by Yehor Dobrovolskyi on 09.10.2018.
+ -->
+
+<apex:page controller="WebFlowController" action="{!doCallout}">
+    <apex:pageBlock title="Hello !">
+        <apex:pageBlockSection>
+            User: {!$User.LastName} <br/>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection>
+            <apex:form>
+                <apex:outputLink
+                        value="https://login.salesforce.com/services/oauth2/authorize?
+                        response_type=code&
+                        client_id=3MVG9fTLmJ60pJ5I19dJ4NlkP67SDTMsZdbhit0RUKEgIH7NYeFdJCv9yVEs1NU_evf6hKibOQA==&
+                        redirect_uri=https://web-flow-oauth-developer-edition.eu16.force.com/webflow">
+                    Click me
+                </apex:outputLink>
+            </apex:form>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection>
+            Access Token: {!isCode} <br/>
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+
+</apex:page>
