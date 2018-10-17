@@ -4,17 +4,17 @@
 
 public without sharing class WebFlowController {
 
-    private static Boolean isCode = false;
+    private static String refreshToken = '';
+
     public void doCallout() {
         String code = ApexPages.currentPage().getParameters().get('code');
         if (!String.isEmpty(code)) {
-           new AccessTokenWebFlow().getToken(code);
-            isCode = true;
+            refreshToken = new RefreshToken().getToken(code);
         }
     }
 
-    public String getIsCode() {
-        return String.valueOf(isCode);
+    public String getRefreshToken() {
+        return refreshToken;
     }
 
 }

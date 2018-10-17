@@ -4,17 +4,14 @@
 
 public with sharing class RemoteAccountCRUD {
 
-    private static final String END_POINT = [
-            SELECT End_Point__c
-            FROM OAuth__mdt
-            WHERE MasterLabel = 'Web flow'
-    ][0].End_Point__c;
-
-    private static Integer numberOfAttempts = 0;
+    private static final String END_POINT = 'https://cunning-bear-99wudk-dev-ed.my.salesforce.com/services/apexrest/Account/';
 
 
-    public static String createAccount(String nameAccount) {
-        String accessToken = access_token__c.getOrgDefaults().Token__c;
+    public static String createAccount(Account account) {
+        String jsonAccount = JSON.serialize(account);
+        System.debug(jsonAccount);
+        String accessToken = TokenFabric.getToken();
+        System.debug('Access Toke: ' + accessToken);
 
         Http http = new Http();
         HttpRequest request = new HttpRequest();
@@ -22,7 +19,7 @@ public with sharing class RemoteAccountCRUD {
         request.setHeader('Content-Type', 'application/json');
         request.setEndpoint(END_POINT + 'create');
         request.setMethod('POST');
-        request.setBody('{"Name":"' + nameAccount + '"}');
+        request.setBody(jsonAccount);
 
         HttpResponse response = http.send(request);
 
@@ -39,7 +36,7 @@ public with sharing class RemoteAccountCRUD {
 
 
     public static HttpResponse getAnyAccount() {
-        String accessToken = web_flou_token__c.getOrgDefaults().access_token__c;
+        String accessToken = TokenFabric.getToken();
 
         Http http = new Http();
         HttpRequest request = new HttpRequest();
